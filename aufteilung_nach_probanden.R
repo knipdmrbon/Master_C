@@ -5,21 +5,41 @@
 # Variable Description
 ######################
 # d.raw -------------------> raw data; read directly from Unipark-file and not modified
-# PP1_columns -------------> columnnames of all product ratings from product group 1
-# PP2_columns -------------> columnnames of all product ratings from product group 2
-# rook_columns ------------> columnnames of all questions related to rook scale (questions 1 to 9)
-# verp_columns ------------> columnnames of all questions related to verplanken scale (questions 1 to 20)
-# feelings_columns --------> columnnames of all feelings; that means questions 1 to 4 related to 
+# PP1_columns -------------> column names of all product ratings from product range 1
+# PP2_columns -------------> column names of all product ratings from product range 2
+# rook_columns ------------> column names of all questions related to Rook & Fisher scale (questions 1 to 9)
+# verp_columns ------------> column names of all questions related to Verplanken & Herabadi scale (questions 1 to 20)
+# feelings_columns --------> column names of all feelings; that means questions 1 to 4 related to 
 #                              warehouse and store respectively
-# Ort_columns -------------> columnnames of room-attractiveness; questions 1 to 3 related to 
+# attr_columns -------------> column names of room-attractiveness; questions 1 to 3 related to 
 #                              warehouse and store respectively
-# d.cleared ---------------> raw data: rows cleaned by surveys not finished or interupted due to technical issues
+# d.cleared ---------------> raw data: rows cleaned by surveys not finished or interrupted due to technical issues
 #                             columns: 
-#                               Ort_PP1, ---> location of product group 1 (either store or warehouse)
-#                               Ort_columns, feelings_columns, rook_columns, verp_columns,
-#                               ort_1.bewertung, ---> start location of product rating (either store or warehouse)
+#                               loc_PP1, ---> location of product group 1 (either store or warehouse)
+#                               attr_columns, feelings_columns, rook_columns, verp_columns,
+#                               loc_first rating, ---> start location of product rating (either store or warehouse)
 #                               vpn ---> unique number for each participant
-#                             
+# d.cleared$VAtm_mean ------> mean score of attractiveness of the sales room (3 questions per participant)
+# d.cleared$LAtm_mean ------> mean score of attractiveness of the warehouse (3 questions per participant)
+# d.cleared$rook_mean ------> mean score of Rook & Fisher scale (questions 1 to 9)
+# d.cleared$verp_mean ------> mean score of Verplanken & Herabadi scale (questions 1 to 20)
+# d.cleared$impuls_mean-----> due to high correlation between the scales of Rook & Fisher and Verplanken & Herabadi
+#                             mean score-> creating a new variable of impulse buying tendency
+# d.cleared$PP1_means ------> mean score of all product ratings of product range 1
+# d.cleared$pp2_means ------> mean score of all product ratings of product range 2
+# d.cleared$PP1_location  --> location of product rating of product range 1 (either store or warehouse)
+# d.cleared$pp2_location ---> location of product rating of product range 2 (either store or warehouse)
+# d.GLM_input --------------> per participant two rows, divided by product ratings made in the sales room and the warehouse
+# fit.all_comp -------------> GLM Model including variables: Y_mean of product rating,
+#                             Location (sales room or warehouse), room attractiveness, feelings (1 to 4)
+#                             impuls_mean, location_first rating
+# fit.loc_impuls -----------> Model with interaction of location and impuls_mean
+# fit.attr_impuls ----------> Model with interaction of room attractiveness and impuls_mean
+#
+# fit.store ----------------> Linear regression model between product_rating and room-attractiveness of sales room
+# fit.warehouse ------------> Linear regression model between product_rating and room-attractiveness of warehouse
+# fit.moderation -----------> Linear regression model between product_rating and room_attractiveness
+#                             and mean of feelings with interaction
 #############################################################################################
 #############################################################################################
 
@@ -77,17 +97,17 @@ feelings_columns <- as.vector(sapply(c("GefV","GefL"),function(x) {paste(x, 1:4,
 
 #### Attraktivität des Befragungsortes 
 # Raumatmosphäre & Lageratmosphäre
-Ort <- c("VAtm", "LAtm")
+attractiveness <- c("VAtm", "LAtm")
 # Für jeden Ort wurden 3 Fragen gestellt
 questions <- 1:3
 # Erzeuge alle möglichen Kombinationen der für die Atmosphäre - sowohl für Verkaufsraum
 # als auch für Lager. Die möglichen Kombinationen sind: [VAtm,LAtm]_[1/2/3]
-Ort_columns <- apply(expand.grid(Ort, questions), 1, function(x) paste(x[1], x[2], sep="_"))
+attr_columns <- apply(expand.grid(attractiveness, questions), 1, function(x) paste(x[1], x[2], sep="_"))
 
 # übernehme aus den Rohdaten nur die Spalten für die wir oben definiert haben 
 # Spaltenüberschriften generiert haben. Weiters wissen wir dass alle Zeilen mit
 # dispcode 31 beendete Fragebögen sind.
-d.cleared <- d.raw[d.raw$dispcode == 31, c(PP1_columns, PP2_columns, "Ort_PP1", Ort_columns, feelings_columns, rook_columns, verp_columns, "ort_1.bewertung", "vpn")]
+d.cleared <- d.raw[d.raw$dispcode == 31, c(PP1_columns, PP2_columns, "Ort_PP1", attr_columns, feelings_columns, rook_columns, verp_columns, "ort_1.bewertung", "vpn")]
 
 # Fehlende Werte werden mit -77 gekennzeichnet. Ersetze -77 mit NA (not available)
 d.cleared[d.cleared == -77] <- NA
@@ -107,7 +127,7 @@ tmp[is.na(tmp)] <- tmp2[is.na(tmp)]
 
 # Zusammenführen der bereinigten Daten und Anreicherung mit Ort_PP1 sowie Atmosphären-Fragen.
 # Aus dem Ort_PP1 kann abgeleitet werden ob eine Bewertung im Verkaufsraum oder im Lager stattgefunden hat.
-d.cleared <- cbind(d.tmp, tmp , d.cleared[, c("Ort_PP1", Ort_columns, feelings_columns, rook_columns, verp_columns, "ort_1.bewertung", "vpn")])
+d.cleared <- cbind(d.tmp, tmp , d.cleared[, c("Ort_PP1", attr_columns, feelings_columns, rook_columns, verp_columns, "ort_1.bewertung", "vpn")])
 
 # Die ersten beiden Zeilen im Datenset enthalten nur Testdaten und müssen für die spätere Analyse ausgeschlossen werden
 d.cleared <- d.cleared[-(1:2),]
