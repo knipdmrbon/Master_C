@@ -19,6 +19,7 @@
 #                               attr_columns, feelings_columns, rook_columns, verp_columns,
 #                               loc_first rating, ---> start location of product rating (either store or warehouse)
 #                               vpn ---> unique number for each participant
+#                               age --> age of the participant
 # d.cleared$VAtm_mean ------> mean score of attractiveness of the sales room (3 questions per participant)
 # d.cleared$LAtm_mean ------> mean score of attractiveness of the warehouse (3 questions per participant)
 # d.cleared$rook_mean ------> mean score of Rook & Fisher scale (questions 1 to 9)
@@ -107,7 +108,7 @@ attr_columns <- apply(expand.grid(attractiveness, questions), 1, function(x) pas
 # übernehme aus den Rohdaten nur die Spalten für die wir oben definiert haben 
 # Spaltenüberschriften generiert haben. Weiters wissen wir dass alle Zeilen mit
 # dispcode 31 beendete Fragebögen sind.
-d.cleared <- d.raw[d.raw$dispcode == 31, c(PP1_columns, PP2_columns, "Ort_PP1", attr_columns, feelings_columns, rook_columns, verp_columns, "ort_1.bewertung", "vpn")]
+d.cleared <- d.raw[d.raw$dispcode == 31, c(PP1_columns, PP2_columns, "Ort_PP1", attr_columns, feelings_columns, rook_columns, verp_columns, "ort_1.bewertung", "vpn", "age")]
 
 # Fehlende Werte werden mit -77 gekennzeichnet. Ersetze -77 mit NA (not available)
 d.cleared[d.cleared == -77] <- NA
@@ -127,7 +128,7 @@ tmp[is.na(tmp)] <- tmp2[is.na(tmp)]
 
 # Zusammenführen der bereinigten Daten und Anreicherung mit Ort_PP1 sowie Atmosphären-Fragen.
 # Aus dem Ort_PP1 kann abgeleitet werden ob eine Bewertung im Verkaufsraum oder im Lager stattgefunden hat.
-d.cleared <- cbind(d.tmp, tmp , d.cleared[, c("Ort_PP1", attr_columns, feelings_columns, rook_columns, verp_columns, "ort_1.bewertung", "vpn")])
+d.cleared <- cbind(d.tmp, tmp , d.cleared[, c("Ort_PP1", attr_columns, feelings_columns, rook_columns, verp_columns, "ort_1.bewertung", "vpn", "age")])
 
 # Die ersten beiden Zeilen im Datenset enthalten nur Testdaten und müssen für die spätere Analyse ausgeschlossen werden
 d.cleared <- d.cleared[-(1:2),]
@@ -265,5 +266,6 @@ cor(d.GLM_input[d.GLM_input$Location == "Store", "Gefühl_mean"],
 cor(d.GLM_input[d.GLM_input$Location == "Warehouse", "Gefühl_mean"],
     d.GLM_input[d.GLM_input$Location == "Warehouse", "Raumattraktivität"])
 
-
-
+############################################ average and SD of age of participants #################################################
+mean(d.cleared$age)
+sd(d.cleared$age)
