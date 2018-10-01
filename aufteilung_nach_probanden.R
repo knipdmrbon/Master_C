@@ -266,6 +266,15 @@ cor(d.GLM_input[d.GLM_input$Location == "Store", "Gefühl_mean"],
 cor(d.GLM_input[d.GLM_input$Location == "Warehouse", "Gefühl_mean"],
     d.GLM_input[d.GLM_input$Location == "Warehouse", "Raumattraktivität"])
 
+############################################ Correlation of impuls_mean & Raumattraktivität #################################################
+cor(d.GLM_input$impuls_mean, d.GLM_input$Raumattraktivität)
+cor.test(d.GLM_input$impuls_mean, d.GLM_input$Raumattraktivität)
+
+############################################ Histogram of impuls_mean #################################################
+hist(d.GLM_input$impuls_mean)
+
 ############################################ average and SD of age of participants #################################################
 mean(d.cleared$age)
 sd(d.cleared$age)
+
+

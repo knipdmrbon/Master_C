@@ -186,6 +186,11 @@ df.product_1_sumed <- melt(cbind(d.cleared[, grepl("PP11_[a-zA-Z]{2,3}_[1-3]", n
 df.product_1_sumed$Produkt_Frage <- sub("_[1-4]", "", df.product_1_sumed$Produkt_Frage) # lösche für jede Variable die Kennung um welche Frage es sich handelt.
 # Mittelwert pro Produkt bilden mit Unterscheidung zwischen Store und Warehouse
 df.product_1_total_means <- aggregate(Rating ~ PP1_location + Produkt_Frage, data = df.product_1_sumed, mean)
+# total means of products
+df.total_means_PP1 <- aggregate(Rating ~ Produkt_Frage, data = df.product_1_sumed, mean)
+# total sd of products
+df.total_sd_PP1 <- aggregate(Rating ~ Produkt_Frage, data = df.product_1_sumed, sd)
+
 names(df.product_1_total_means)[names(df.product_1_total_means) == 'PP1_location'] <- 'Location'
 
 df.product_2_sumed <- melt(cbind(d.cleared[, grepl("PP21_[a-zA-Z]{2,3}_[1-3]", names(d.cleared))], PP2_location = d.cleared$PP2_location),
@@ -194,6 +199,10 @@ df.product_2_sumed <- melt(cbind(d.cleared[, grepl("PP21_[a-zA-Z]{2,3}_[1-3]", n
                            value.name = "Rating")
 df.product_2_sumed$Produkt_Frage <- sub("_[1-4]", "", df.product_2_sumed$Produkt_Frage) # lösche für jede Variable die Kennung um welche Frage es sich handelt.
 df.product_2_total_means <- aggregate(Rating ~ PP2_location + Produkt_Frage, data = df.product_2_sumed, mean)
+# total means of products
+df.total_means_PP2 <- aggregate(Rating ~ Produkt_Frage, data = df.product_2_sumed, mean)
+# total sd of products
+df.total_sd_PP2 <- aggregate(Rating ~ Produkt_Frage, data = df.product_2_sumed, sd)
 names(df.product_2_total_means)[names(df.product_2_total_means) == 'PP2_location'] <- 'Location'
 
 # Mittwerte von PP1 und PP2 in einer Tabelle zusammenfassen (untereinander schreiben)
