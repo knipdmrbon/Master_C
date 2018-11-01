@@ -269,9 +269,13 @@ ggplot(d.atmosphere, aes(x = Roomattractiveness, color = Location)) +
 
 # Dichte für LAtm und VAtm sowie deren Mittelwert zeichnen
 ggplot(d.atmosphere, aes(x = Roomattractiveness)) +
-  geom_density(aes(group=Location, colour=Location, fill=Location), alpha=0.3) +
-  geom_vline(data = d.means, aes(xintercept = x, color = Group.1), linetype="dashed", size=1)
-
+  geom_density(aes(group=Location, fill = Location), alpha=0.3) +
+  geom_vline(data = d.means, aes(xintercept = x), linetype="dashed", size=1) +
+  scale_fill_grey() + theme_classic(base_size = 17)#theme(legend.text=element_text(size=20),
+  #                                              legend.title=element_text(size=20),
+  #                                              axis.title=element_text(size=20),
+  #                                              axis.text = element_text(size=20))
+  
 ggplot(d.atmosphere, aes(x = Roomattractiveness)) +
   geom_density(aes(group=Location, colour=Location, fill=Location), alpha=0.3) +
   geom_vline(data = d.means, aes(xintercept = x, color = Group.1), linetype="dashed", size=1) +
