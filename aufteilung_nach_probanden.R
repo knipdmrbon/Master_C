@@ -50,6 +50,7 @@ library(rstudioapi) # Paket zum setzen des "Working-Directories"
 library(psych) # Paket für Cronbachs Alpha
 library(ggplot2) # Paket für Grafiken
 library(reshape2) # Paket für Datentransformation
+library(cowplot) # make ggplots in a grid
 
 # Setze das "Working Directory" auf den Ordner wo das .R-File und die Rohdaten liegen
 # FAlls der folgende Befehl nicht funktioniert kann man das "Working Directory" auch 
@@ -193,15 +194,15 @@ d.GLM_input$ort_1.bewertung <- as.factor(d.GLM_input$ort_1.bewertung)
 
 # GLM - Model with all components
 fit.all_comp <- glm(Y_Produktbewertung_gemittelt ~ Location+Raumattraktivität+Gefühl_1+Gefühl_2+Gefühl_3+Gefühl_4+impuls_mean+ort_1.bewertung,data=d.GLM_input,family=gaussian)
-summary(fit.all_comp)
+summary.lm(fit.all_comp)
 
 # GLM - Model Impulskauftendenz with Interaction
 fit.loc_impuls <- glm(Y_Produktbewertung_gemittelt ~ Location*impuls_mean,data=d.GLM_input,family=gaussian)
-summary(fit.loc_impuls)
+summary.lm(fit.loc_impuls)
 
 # GLM - Model Impulskauftendenz with Interaction
 fit.attr_impuls <- glm(Y_Produktbewertung_gemittelt ~ Raumattraktivität*impuls_mean,data=d.GLM_input,family=gaussian)
-summary(fit.attr_impuls)
+summary.lm(fit.attr_impuls)
 
 write.csv(d.GLM_input, file = "GLM_input.csv", row.names = FALSE)
 
@@ -219,10 +220,12 @@ cor.test(d.GLM_input[d.GLM_input$Location == "Store", "Y_Produktbewertung_gemitt
          method = "pearson")
 
 # regression-plot for Produktbewertung VS Raumattraktivität
-ggplot(d.GLM_input[d.GLM_input$Location == "Store",],
-       aes(x = Raumattraktivität, y = Y_Produktbewertung_gemittelt)) +
+regStore <- ggplot(d.GLM_input[d.GLM_input$Location == "Store",],
+                   aes(x = Raumattraktivität, y = Y_Produktbewertung_gemittelt)) +
   geom_point(shape = 1) +    # Use hollow circles
-  geom_smooth(method = lm)   # Add linear regression line (by default includes 95% confidence region)
+  geom_smooth(method = lm) + # Add linear regression line (by default includes 95% confidence region)
+  labs(title = "Salesroom", x = "Roomattractiveness", y = "Product Rating") +
+  scale_fill_grey() + theme_classic(base_size = 17)
 
 # Regression for Warehouse
 fit.warehouse <- lm(Y_Produktbewertung_gemittelt ~ Raumattraktivität, data = d.GLM_input[d.GLM_input$Location == "Warehouse",])
@@ -234,10 +237,14 @@ cor.test(d.GLM_input[d.GLM_input$Location == "Warehouse", "Y_Produktbewertung_ge
          method = "pearson")
 
 # regression-plot for Produktbewertung VS Raumattraktivität
-ggplot(d.GLM_input[d.GLM_input$Location == "Warehouse",],
-       aes(x = Raumattraktivität, y = Y_Produktbewertung_gemittelt)) +
+regWare <- ggplot(d.GLM_input[d.GLM_input$Location == "Warehouse",],
+                  aes(x = Raumattraktivität, y = Y_Produktbewertung_gemittelt)) + 
   geom_point(shape = 1) +    # Use hollow circles
-  geom_smooth(method = lm)   # Add linear regression line (by default includes 95% confidence region)
+  geom_smooth(method = lm) + # Add linear regression line (by default includes 95% confidence region)
+  labs(title = "Warehouse", x = "Roomattractiveness", y = "Product Rating") +
+  scale_fill_grey() + theme_classic(base_size = 17)
+
+cowplot::plot_grid(regWare, regStore)
 
 # Regression with Moderation
 fit.moderation <- lm(Y_Produktbewertung_gemittelt ~ Raumattraktivität * Gefühl_mean, data = d.GLM_input)

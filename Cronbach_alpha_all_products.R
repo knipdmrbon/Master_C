@@ -4,6 +4,8 @@ library(psych) # Paket für Cronbachs Alpha
 library(ggplot2) # Paket für Grafiken
 library(reshape2) # Paket für Datentransformation
 
+#sessionInfo() # get the version of the packages attached
+
 # Setze das "Working Directory" auf den Ordner wo das .R-File und die Rohdaten liegen
 # FAlls der folgende Befehl nicht funktioniert kann man das "Working Directory" auch 
 # händisch setzen mittels CTRL + STRG + H
