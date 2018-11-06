@@ -211,13 +211,14 @@ names(df.product_2_total_means)[names(df.product_2_total_means) == 'PP2_location
 df.all_means <- rbind(df.product_1_total_means, df.product_2_total_means)
 
 # Definiere neue x-Achsen-Beschriftung für die Grafik
-labels_x_axis <- c("Trousers_light", "Jacket_blue", "Jumper_grey", "Skirt_black", "T-Shirt_grey", "Skarf_zigzag",
-                   "Trousers_blue", "Jacket_black", "Jumper_striped", "Skirt_grey", "Skarf_checked", "T-Shirt_white")
+labels_x_axis <- c("Trousers_light", "Jacket_blue", "Jumper_grey", "Skirt_black", "T-Shirt_grey", "Scarf_zigzag",
+                   "Trousers_blue", "Jacket_black", "Jumper_striped", "Skirt_grey", "Scarf_checked", "T-Shirt_white")
 
 ggplot(df.all_means, aes(Produkt_Frage, Rating)) +
   geom_point(aes(colour = Location), size = 4) + # Datenpunkte je nach location färben und Größe ändern
   labs(color = "Location") + # Legende beschriften
   scale_x_discrete(labels = labels_x_axis) + # lösche PP11_ aus Variablennamen
+  scale_color_manual(labels = c("Salesroom", "Warehouse"), values = c("#F8766D", "#00BA38")) +
   labs(x = "Products") +
   theme(axis.text = element_text(size = 15)) +
   theme(axis.title = element_text(size = 15, face = "bold")) +
