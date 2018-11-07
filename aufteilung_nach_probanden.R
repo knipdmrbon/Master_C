@@ -193,7 +193,7 @@ d.GLM_input$Gefühl_mean <- rowMeans(d.GLM_input[,paste0("Gefühl_",1:4)])
 d.GLM_input$ort_1.bewertung <- as.factor(d.GLM_input$ort_1.bewertung)
 
 # GLM - Model with all components
-fit.all_comp <- glm(Y_Produktbewertung_gemittelt ~ Location+Raumattraktivität+Gefühl_1+Gefühl_2+Gefühl_3+Gefühl_4+impuls_mean+ort_1.bewertung,data=d.GLM_input,family=gaussian)
+fit.all_comp <- glm(Y_Produktbewertung_gemittelt ~ Location+Raumattraktivität+Gefühl_mean+impuls_mean+ort_1.bewertung,data=d.GLM_input,family=gaussian)
 summary.lm(fit.all_comp)
 
 # GLM - Model Impulskauftendenz with Interaction
@@ -276,9 +276,6 @@ cor(d.GLM_input[d.GLM_input$Location == "Warehouse", "Gefühl_mean"],
 ############################################ Correlation of impuls_mean & Raumattraktivität #################################################
 cor(d.GLM_input$impuls_mean, d.GLM_input$Raumattraktivität)
 cor.test(d.GLM_input$impuls_mean, d.GLM_input$Raumattraktivität)
-
-############################################ Histogram of impuls_mean #################################################
-hist(d.GLM_input$impuls_mean)
 
 ############################################ average and SD of age of participants #################################################
 mean(d.cleared$age)

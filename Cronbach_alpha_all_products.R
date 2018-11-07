@@ -137,48 +137,6 @@ psych::alpha(d.cleared[, rook_columns])
 verp_columns <- grepl("verp", names(d.cleared))
 psych::alpha(d.cleared[, verp_columns])
 
-########################################## Mittelwerte pro Produkt & Frage ################################################
-
-##### Produktpalette 1 #####
-# Berechnung der Mittelwerte für jede Frage für alle Produkte aus Produktpalette 1
-means_products_1<- aggregate(d.cleared[, grepl("PP11_[a-zA-Z]{2,3}_[1-4]", names(d.cleared))], list(d.cleared$PP1_location), mean)
-# Mittelwerte von Produktpalette 1 in geeignetes Format für grafische Darstellung bringen (schreibe alle Werte in eine lange Liste)
-df.means_melt_1 <- melt(means_products_1, id.vars = c("Group.1"), 
-                          variable.name = "Produkte_Fragen",
-                          value.name =  "Rating")
-# Definiere neue x-Achsen-Beschriftungen für die Grafik
-labels_x_axis <- apply(expand.grid(c("T-Shirt_", "Jumper_", "Jacket_", "Scarf_", "Skirt_", "Trousers_"), 1:4), 1, function(x) paste0(x[1], x[2]))
-
-# Mittelwerte von Produktpalette 1 pro Frage zeichnen
-ggplot(df.means_melt_1, aes(Produkte_Fragen, Rating)) +
-  geom_point(aes(colour = Group.1), size = 4) + # Datenpunkte je nach location färben und Größe ändern
-  labs(color = "Location") + # Legende beschriften
-  scale_x_discrete(labels = labels_x_axis) + # neue Achsen-Beschriftung verwenden
-  labs(x = "Products") + # Achsentitel für x-Achse ändern
-  theme(axis.text = element_text(size = 15)) + # Größe der Beschriftung ändern
-  theme(axis.title = element_text(size = 15, face = "bold")) + # Größe der Beschriftung ändern
-  theme(legend.text = element_text(size = 15)) + # Größe der Beschriftung ändern
-  theme(axis.text.x = element_text(angle = 90, vjust = 0.5, hjust=1)) # Beschriftung x-Achse um 90° drehen
-
-##### Produktpalette 2 #####
-# Berechnung der Mittelwerte für jede Frage für alle Produkte aus Produktpalette 2
-means_products_2<- aggregate(d.cleared[, grepl("PP21_[a-zA-Z]{2,3}_[1-4]", names(d.cleared))], list(d.cleared$PP2_location), mean)
-# Mittelwerte von Produktpalette 2 in geeignetes Format für grafische Darstellung bringen (schreibe alle Werte in eine lange Liste)
-df.means_melt_2 <- melt(means_products_2, id.vars = c("Group.1"), 
-                        variable.name = "Produkte_Fragen",
-                        value.name =  "Rating")
-
-# Mittelwerte von Produktpalette 2 pro Frage plotten
-ggplot(df.means_melt_2, aes(Produkte_Fragen, Rating)) +
-  geom_point(aes(colour = Group.1), size = 4) + # Datenpunkte je nach location färben und Größe ändern
-  labs(color = "Location") + # Legende beschriften
-  scale_x_discrete(labels = labels_x_axis) + # lösche PP11_ aus Variablennamen
-  labs(x = "Products") +
-  theme(axis.text = element_text(size = 15)) +
-  theme(axis.title = element_text(size = 15, face = "bold")) +
-  theme(legend.text = element_text(size = 15)) +
-  theme(axis.text.x = element_text(angle = 90, vjust = 0.5, hjust=1)) # Beschriftung x-Achse um 90° drehen
-
 ########################################## Mittelwerte pro Produkt ################################################
 # alle Saplten für die Fragen 1-3 in eine lange Liste untereinander schreiben 
 df.product_1_sumed <- melt(cbind(d.cleared[, grepl("PP11_[a-zA-Z]{2,3}_[1-3]", names(d.cleared))], PP1_location = d.cleared$PP1_location),
@@ -225,30 +183,6 @@ ggplot(df.all_means, aes(Produkt_Frage, Rating)) +
   theme(legend.text = element_text(size = 15)) +
   theme(axis.text.x = element_text(angle = 90, vjust = 0.5, hjust=1)) # Beschriftung x-Achse um 90° drehen
 
-########################################## Median pro Produkt ################################################
-# Median berechnen pro Produkt und Location (für PP1)
-df.product_1_total_median <- aggregate(Rating ~ PP1_location + Produkt_Frage, data = df.product_1_sumed, median)
-names(df.product_1_total_median)[names(df.product_1_total_median) == 'PP1_location'] <- 'Location'
-# Median berechnen pro Produkt und Location (für PP2)
-df.product_2_total_median <- aggregate(Rating ~ PP2_location + Produkt_Frage, data = df.product_2_sumed, median)
-names(df.product_2_total_median)[names(df.product_2_total_median) == 'PP2_location'] <- 'Location'
-
-# Mediane von PP1 und PP2 in einer Tabelle zusammenfassen (untereinander schreiben)
-df.all_medians <- rbind(df.product_1_total_median, df.product_2_total_median)
-
-# Definiere neue x-Achsen-Beschriftung für die Grafik
-labels_x_axis <- c("Trousers_light", "Jacket_blue", "Jumper_grey", "Skirt_black", "T-Shirt_grey", "Skarf_zigzag",
-                   "Trousers_blue", "Jacket_black", "Jumper_striped", "Skirt_grey", "Skarf_checked", "T-Shirt_white")
-
-ggplot(df.all_medians, aes(x = Produkt_Frage, y = Rating)) +
-  geom_point(aes(colour = Location), size = 4) + # Datenpunkte je nach location färben und Größe ändern
-  labs(color = "Location") + # Legende beschriften
-  scale_x_discrete(labels = labels_x_axis) + # lösche PP11_ aus Variablennamen
-  labs(x = "Products") +
-  theme(axis.text = element_text(size = 15)) +
-  theme(axis.title = element_text(size = 15, face = "bold")) +
-  theme(legend.text = element_text(size = 15)) +
-  theme(axis.text.x = element_text(angle = 90, vjust = 0.5, hjust=1)) # Beschriftung x-Achse um 90° drehen
 
 ########################################## Dichte der Atmosphäre ################################################
 # Für jeden Probanden berechnen wir den Mittelwert von VAtm (Verkaufsraumatmosphäre) sowie von LAtm (Lageratmosphäre)
@@ -323,67 +257,11 @@ cor.test(df.means_impuls_skala$impulse_skala, d.diff_store_warehouse, method = "
 
 ########################################## Regression ################################################
 df.means_products <- data.frame(total_product_rating = rowMeans(d.cleared[, grepl("[PP11|PP21]_[a-zA-Z]{2,3}_[1-3]", names(d.cleared))]))
-df.fit_store <- cbind(df.means_products, d.means_VAtm)
-df.fit_warehouse <- cbind(df.means_products, d.means_LAtm)
 df.fit_location <- cbind(df.means_products, data.frame(total_location_rating = rowMeans(cbind(d.means_VAtm, d.means_LAtm))))
-
-fit.warehouse <- lm(total_product_rating ~ Warehouse, data = df.fit_warehouse)
-summary(fit.warehouse)
-cor.test(df.fit_warehouse$total_product_rating, df.fit_warehouse$Warehouse, method = "pearson")
-
-fit.store <- lm(total_product_rating ~ Store, data = df.fit_store)
-summary(fit.store)
-cor.test(df.fit_store$total_product_rating, df.fit_store$Store, method = "pearson")
 
 fit.location <- lm(total_product_rating ~ total_location_rating, data = df.fit_location)
 summary(fit.location)
 cor.test(df.fit_location$total_product_rating, df.fit_location$total_location_rating, method = "pearson")
-
-# regression for Store
-ggplot(df.fit_store, aes(x = Store, y = total_product_rating)) +
-  geom_point(shape = 1) +    # Use hollow circles
-  geom_smooth(method = lm)   # Add linear regression line (by default includes 95% confidence region)
-
-# regression for warehouse
-ggplot(df.fit_warehouse, aes(x = Warehouse, y = total_product_rating)) +
-  geom_point(shape = 1) +    # Use hollow circles
-  geom_smooth(method = lm)   # Add linear regression line (by default includes 95% confidence region)
-
-# regression for warehouse & store
-ggplot(df.fit_location, aes(x = total_location_rating, y = total_product_rating)) +
-  geom_point(shape = 1) +    # Use hollow circles
-  geom_smooth(method = lm)   # Add linear regression line (by default includes 95% confidence region)
-
-
-########################################## MANOVA ################################################
-
-# Ort der ersten Bewertung (Verkaufsraum oder Lager)
-location <- d.cleared$ort_1.bewertung
-# als Faktor definieren, damit in MANOVA verwendbar
-location <- as.factor(location)
-# Wo liegt PP1 (Store oder Warehouse)
-PP1_loc <- d.cleared$PP1_location
-# als Faktor definieren, damit in MANOVA verwendbar
-PP1_loc <- as.factor(PP1_loc)
-
-#erg_manova <- manova(cbind(rowMeans(d.cleared[, grepl("PP11_[a-zA-Z]{2,3}_[1-3]", names(d.cleared))]),
-#                     rowMeans(d.cleared[, grepl("PP21_[a-zA-Z]{2,3}_[1-3]", names(d.cleared))])) ~ cbind(location,PP1_loc))
-
-erg_manova <- manova(cbind(rowMeans(d.cleared[, grepl("PP11_[a-zA-Z]{2,3}_[1-3]", names(d.cleared))]),
-                     rowMeans(d.cleared[, grepl("PP21_[a-zA-Z]{2,3}_[1-3]", names(d.cleared))])) ~ location * PP1_loc)
-
-summary(erg_manova)
-summary.aov(erg_manova)
-
-cbind(rowMeans(d.cleared[, grepl("PP21_[a-zA-Z]{2,3}_[1-4]", names(d.cleared))]), location)
-
-t.test(rowMeans(d.cleared[, grepl("PP21_[a-zA-Z]{2,3}_[1-3]", names(d.cleared))]) ~ as.factor(location),alternative = "two.sided" )
-
-length(rowMeans(d.cleared[, grepl("PP21_[a-zA-Z]{2,3}_[1-3]", names(d.cleared))]))
-length(d.cleared$PP2_location)
-
-df(2.6275, 4, 144, log = FALSE)
-1-pf(2.6275, 4, 144, lower.tail = TRUE, log.p = FALSE)
 
 ########################################## t-Test ################################################
 # unterscheiden sich die Bewertungen von PP1 und PP2 
@@ -400,49 +278,3 @@ mean(PP1_total_mean)
 sd(PP1_total_mean)
 mean(PP2_total_mean)
 sd(PP2_total_mean)
-
-
-PP_total_means <- melt(cbind(PP1_total_mean, PP2_total_mean), value.name =  "Rating")
-
-
-ggplot(PP_total_means, aes(Var1, Rating)) +
-  geom_point(aes(colour = Var2), size = 4)+ # Datenpunkte je nach location färben und Größe ändern
-  labs(color = "Productrange") + # Legende beschriften
-  labs(x = "Participants") + # Achsentitel für x-Achse ändern
-  theme(axis.title = element_text(size = 15, face = "bold")) +  # Größe der Beschriftung ändern
-  theme(legend.text = element_text(size = 15)) # Größe der Beschriftung ändern
-  
-  
-# Mittelwerte von Produktpalette 1 pro Frage zeichnen
-ggplot(df.means_melt_1, aes(Produkte_Fragen, Rating)) +
-  geom_point(aes(colour = Group.1), size = 4) + # Datenpunkte je nach location färben und Größe ändern
-  labs(color = "Location") + # Legende beschriften
-  scale_x_discrete(labels = labels_x_axis) + # neue Achsen-Beschriftung verwenden
-  labs(x = "Products") + # Achsentitel für x-Achse ändern
-  theme(axis.text = element_text(size = 15)) + # Größe der Beschriftung ändern
-  theme(axis.title = element_text(size = 15, face = "bold")) + # Größe der Beschriftung ändern
-  theme(legend.text = element_text(size = 15)) + # Größe der Beschriftung ändern
-  theme(axis.text.x = element_text(angle = 90, vjust = 0.5, hjust=1)) # Beschriftung x-Achse um 90° drehen
-
-########################################## t-Test ################################################
-# unterscheiden sich die Bewertungen von PP1 zwischen Lager und Verkaufsraum?
-# unterscheiden sich die Bewertungen von PP2 zwischen Lager und Verkaufsraum?
-
-d.cleared$PP1_means <- rowMeans(d.cleared[, grepl("PP11_[a-zA-Z]{2,3}_[1-3]", names(d.cleared))])
-d.cleared$PP2_means <- rowMeans(d.cleared[, grepl("PP21_[a-zA-Z]{2,3}_[1-3]", names(d.cleared))])
-
-write.csv(d.cleared, file = "test.csv")
-
-t.test(d.cleared[d.cleared$PP1_location == "Store", "PP1_means"],
-       d.cleared[d.cleared$PP1_location == "Warehouse", "PP1_means"])
-
-t.test(d.cleared[d.cleared$PP2_location == "Store", "PP2_means"],
-       d.cleared[d.cleared$PP2_location == "Warehouse", "PP2_means"])
-
-store <- c(d.cleared[d.cleared$PP1_location == "Store", "PP1_means"],
-           d.cleared[d.cleared$PP2_location == "Store", "PP2_means"])
-
-warehouse <- c(d.cleared[d.cleared$PP1_location == "Warehouse", "PP1_means"],
-               d.cleared[d.cleared$PP2_location == "Warehouse", "PP2_means"])
-
-t.test(store, warehouse)
